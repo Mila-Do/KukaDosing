@@ -1,0 +1,1110 @@
+{
+  "basePoints": {
+    "Xdose_A_1": {
+      "x": 17,
+      "y": 3
+    },
+    "Xdose_A_2": {
+      "x": 31,
+      "y": 3
+    },
+    "Xdose_B_1": {
+      "x": 17,
+      "y": -5
+    },
+    "Xdose_B_2": {
+      "x": 31,
+      "y": -7
+    }
+  },
+  "offsets": [
+    {
+      "name": "dose_A_offset_010",
+      "x": -2,
+      "y": -2,
+      "z": 45,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_020",
+      "x": -4,
+      "y": -2.5,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_030",
+      "x": -5.5,
+      "y": -2.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_040",
+      "x": 6.5,
+      "y": -4,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_050",
+      "x": 7,
+      "y": 4,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_060",
+      "x": -5.5,
+      "y": 2.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_070",
+      "x": -4,
+      "y": 1,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_080",
+      "x": -2,
+      "y": -2.5,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_090",
+      "x": 2,
+      "y": 2.5,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_100",
+      "x": 5,
+      "y": -2,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_105",
+      "x": -9,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_110",
+      "x": -8,
+      "y": 2,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_115",
+      "x": -7,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_120",
+      "x": -6,
+      "y": -4.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_125",
+      "x": -5,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_130",
+      "x": -4,
+      "y": 2.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_135",
+      "x": -3,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_140",
+      "x": -2,
+      "y": -5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_145",
+      "x": -1,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_150",
+      "x": 0,
+      "y": 3,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_155",
+      "x": 2,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_160",
+      "x": 4,
+      "y": -2.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_165",
+      "x": 5,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_170",
+      "x": 6,
+      "y": 2.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_180",
+      "x": 4.5,
+      "y": -2.5,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_190",
+      "x": 0,
+      "y": 1.5,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_200",
+      "x": -2,
+      "y": -0.5,
+      "z": 1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_210",
+      "x": 2,
+      "y": 0,
+      "z": 2,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_220",
+      "x": 0,
+      "y": 0,
+      "z": 15,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_230",
+      "x": 5,
+      "y": 0,
+      "z": 25,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_B_offset_010",
+      "x": -2,
+      "y": -2,
+      "z": 45,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_020",
+      "x": -4,
+      "y": -2.5,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_030",
+      "x": -5.5,
+      "y": -2.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_040",
+      "x": 6.5,
+      "y": -4,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_050",
+      "x": 7,
+      "y": 4,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_060",
+      "x": -5.5,
+      "y": 2.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_070",
+      "x": -4,
+      "y": 1,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_080",
+      "x": -2,
+      "y": -2.5,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_090",
+      "x": 2,
+      "y": 2.5,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_100",
+      "x": 5,
+      "y": -2,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_105",
+      "x": -9,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_110",
+      "x": -8,
+      "y": 2,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_115",
+      "x": -7,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_120",
+      "x": -6,
+      "y": -4.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_125",
+      "x": -5,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_130",
+      "x": -4,
+      "y": 2.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_135",
+      "x": -3,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_140",
+      "x": -2,
+      "y": -5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_145",
+      "x": -1,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_150",
+      "x": 0,
+      "y": 3,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_155",
+      "x": 2,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_160",
+      "x": 4,
+      "y": -2.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_165",
+      "x": 5,
+      "y": 0,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_170",
+      "x": 6,
+      "y": 2.5,
+      "z": -1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_180",
+      "x": 4.5,
+      "y": -2.5,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_190",
+      "x": 0,
+      "y": 1.5,
+      "z": 0.5,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_200",
+      "x": -2,
+      "y": -0.5,
+      "z": 1,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_210",
+      "x": 2,
+      "y": 0,
+      "z": 2,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_220",
+      "x": 0,
+      "y": 0,
+      "z": 15,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_230",
+      "x": 5,
+      "y": 0,
+      "z": 25,
+      "a": 0,
+      "b": 0,
+      "c": 0,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    }
+  ],
+  "positions": [
+    {
+      "name": "dose_A_offset_010",
+      "x": 15,
+      "y": 1,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_020",
+      "x": 13,
+      "y": 0.5,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_030",
+      "x": 25.5,
+      "y": 0.5,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_040",
+      "x": 37.5,
+      "y": -1,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_050",
+      "x": 38,
+      "y": 7,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_060",
+      "x": 25.5,
+      "y": 5.5,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_070",
+      "x": 13,
+      "y": 4,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_080",
+      "x": 15,
+      "y": 0.5,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_090",
+      "x": 19,
+      "y": 5.5,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_100",
+      "x": 22,
+      "y": 1,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_105",
+      "x": 22,
+      "y": 3,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_110",
+      "x": 23,
+      "y": 5,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_115",
+      "x": 24,
+      "y": 3,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_120",
+      "x": 25,
+      "y": -1.5,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_125",
+      "x": 26,
+      "y": 3,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_130",
+      "x": 27,
+      "y": 5.5,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_135",
+      "x": 28,
+      "y": 3,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_140",
+      "x": 29,
+      "y": -2,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_145",
+      "x": 30,
+      "y": 3,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_150",
+      "x": 31,
+      "y": 6,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_155",
+      "x": 33,
+      "y": 3,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_160",
+      "x": 35,
+      "y": 0.5,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_165",
+      "x": 36,
+      "y": 3,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_170",
+      "x": 37,
+      "y": 5.5,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_180",
+      "x": 35.5,
+      "y": 0.5,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_190",
+      "x": 31,
+      "y": 4.5,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_200",
+      "x": 29,
+      "y": 2.5,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_210",
+      "x": 19,
+      "y": 3,
+      "basePoint": "Xdose_A_1",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_220",
+      "x": 31,
+      "y": 3,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_A_offset_230",
+      "x": 36,
+      "y": 3,
+      "basePoint": "Xdose_A_2",
+      "doseType": "A"
+    },
+    {
+      "name": "dose_B_offset_010",
+      "x": 15,
+      "y": -7,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_020",
+      "x": 13,
+      "y": -7.5,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_030",
+      "x": 25.5,
+      "y": -9.5,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_040",
+      "x": 37.5,
+      "y": -11,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_050",
+      "x": 38,
+      "y": -3,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_060",
+      "x": 25.5,
+      "y": -4.5,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_070",
+      "x": 13,
+      "y": -4,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_080",
+      "x": 15,
+      "y": -7.5,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_090",
+      "x": 19,
+      "y": -2.5,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_100",
+      "x": 22,
+      "y": -7,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_105",
+      "x": 22,
+      "y": -7,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_110",
+      "x": 23,
+      "y": -5,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_115",
+      "x": 24,
+      "y": -7,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_120",
+      "x": 25,
+      "y": -11.5,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_125",
+      "x": 26,
+      "y": -7,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_130",
+      "x": 27,
+      "y": -4.5,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_135",
+      "x": 28,
+      "y": -7,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_140",
+      "x": 29,
+      "y": -12,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_145",
+      "x": 30,
+      "y": -7,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_150",
+      "x": 31,
+      "y": -4,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_155",
+      "x": 33,
+      "y": -7,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_160",
+      "x": 35,
+      "y": -9.5,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_165",
+      "x": 36,
+      "y": -7,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_170",
+      "x": 37,
+      "y": -4.5,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_180",
+      "x": 35.5,
+      "y": -9.5,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_190",
+      "x": 31,
+      "y": -5.5,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_200",
+      "x": 29,
+      "y": -7.5,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_210",
+      "x": 19,
+      "y": -5,
+      "basePoint": "Xdose_B_1",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_220",
+      "x": 31,
+      "y": -7,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    },
+    {
+      "name": "dose_B_offset_230",
+      "x": 36,
+      "y": -7,
+      "basePoint": "Xdose_B_2",
+      "doseType": "B"
+    }
+  ],
+  "stats": {
+    "totalOffsets": 60,
+    "dose_A_count": 30,
+    "dose_B_count": 30,
+    "totalPositions": 60
+  }
+}

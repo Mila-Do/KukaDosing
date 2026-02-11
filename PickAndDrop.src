@@ -1,0 +1,1115 @@
+&ACCESS RVP2
+&REL 4601
+&PARAM DISKPATH = KRC:\R1\Program\010_Trajectories
+DEF PickAndDrop( )
+   FileInit()
+   if ( not typeChosen) THEN
+      UpdateTypeManually()  
+      typeChosen = TRUE
+      
+   ENDIF  
+   CheckActType() 
+   setDetIndex(collIndexPart01)
+   acc_percent=acc_percent_cycle
+   
+   ;FOLD PTP startPos01 CONT 
+      SET_CD_PARAMS (collisionDetecIndex)
+      SetStandardTCP()
+      SetToolBase(TCPNr_WithooutPart,BaseNr_main)
+      setAPO(apo_distance)
+      SetVel(v_fast)
+      PTP XstartPos01 C_Dis
+      ;fold teach
+         CONTINUE
+         if (teach_mode) then  
+            TouchUpPoint(XstartPos01)
+         endif             
+      ;endfold
+      
+   ;ENDFOLD
+   
+   LOOP
+      
+      if EnablePicking then  
+         
+         ;fold PICK
+            
+            TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO uruchomTimer(nrTimerTotalCycle) PRIO = -1 
+            TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO uruchomTimer(nrTimerPick) PRIO = -1      
+            TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = -100 DO Starting(StatNb_Pick) PRIO = -1     
+            
+            
+            
+            
+            ;FOLD PTP midPick010 CONT
+               SET_CD_PARAMS (collisionDetecIndex)
+               SetStandardTCP()
+               SetToolBase(TCPNr_WithooutPart,BaseNr_main)
+               setAPO(apo_distance)
+               SetVel(v_fast)
+               PTP XmidPick010 C_Dis
+               ;fold teach
+                  CONTINUE
+                  if (teach_mode) then  
+                     TouchUpPoint(XmidPick010)
+                  endif             
+               ;endfold
+               ;ENDFOLD
+               
+            CheckActType()   
+            CompareGriperCode()
+            GripperPreasure_ByType(currentType)         
+            KukaReadyToPickOn()
+            GripperOpenADV()  
+            
+            TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = -100 DO SetStatusWaitingFor(StatNb_Pick) PRIO = -1     
+
+            
+            ;FOLD PTP midPick020 CONT
+               SET_CD_PARAMS (collisionDetecIndex)
+               SetStandardTCP()
+               SetToolBase(TCPNr_WithooutPart,BaseNr_main)
+               setAPO(apo_distance)
+               SetVel(v_fast)
+               PTP XmidPick020 C_Dis
+               ;fold teach
+                  CONTINUE
+                  if (teach_mode) then  
+                     TouchUpPoint(XmidPick020)
+                  endif             
+               ;endfold
+            ;ENDFOLD
+            
+            WaitingForPickRdy()   
+            
+            checkPickPos() 
+            PickToolOffset_appr()         
+            
+            CONTINUE
+            wait for not workZoneBusy_PickIN
+            TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = -100 DO SetStatusActive(StatNb_Pick) PRIO = -1     
+            ;FOLD PTP RELTOOL PICKPOSITION:TEMPOFFSET  
+               SET_CD_PARAMS (collisionDetecIndex)
+               SetStandardTCP()
+               SetToolBase(TCPNr_WithooutPart,BaseNr_pick)
+               setAPO(apo_distance)
+               SetVel(v_fast)
+               PTP XPickPosition:OffsetPickApr C_DIS
+            ;ENDFOLD
+            
+            ;FOLD LIN PICKPOSITION
+               SET_CD_PARAMS (collisionDetecIndex)
+               SetStandardTCP()
+               SetToolBase(TCPNr_WithooutPart,BaseNr_pick)            
+               SetVel(v_mid)
+               LIN XPickPosition             
+               ;fold teach
+                  CONTINUE
+                  if (teach_mode) then 
+                     XPickPosition = $POS_ACT                  
+                     TouchUpPoint(pickPositions[currentType,currentPickLayer,currentPickIndex].point)
+                     ApplyPickPos()
+                  endif             
+               ;endfold
+            ;ENDFOLD
+            
+            wait sec 0
+            GripperClWPartCheck()            
+            partInGripperON()
+            
+            ;MonitorPickBdoneACKOn()   
+            
+            wait sec 0
+            SetStatusDone(StatNb_Pick)
+            KukaPickDoneOn()
+            
+            TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO KukaReadyToDropOn() PRIO = -1
+            ;FOLD LIN RELTOOL PICKPOSITION:TEMPOFFSET_SHORT  
+               SET_CD_PARAMS (collisionDetecIndex)
+               SetStandardTCP()
+               SetToolBase(TCPNr_WithPart,BaseNr_pick)
+               setAPO(apo_distance)
+               SetVel(v_mid)
+               LIN XPickPosition:OffsetPickAprShort C_DIS C_DIS
+            ;ENDFOLD    
+            wait sec 0             
+            SetStatusActive(StatNb_Inspection01)
+            
+            WAIT FOR CognexReady
+            SetStatusDone(StatNb_Inspection01)
+            
+            if EnableVisCorr then 
+               IF isCognexNonZeroVal() THEN
+                  CognexUpdateValues()                  
+                  ImplementCognexCoord() 
+                  
+                  UpdateCorrValues()
+                  ImplementCorr()
+                  
+               ELSE 
+                  halt
+                  ; nie prawidlowe wartosci todo
+               ENDIF  
+            ELSE               
+               ImplemtConstCoord()
+            endif
+            
+            ;FOLD PTP RELTOOL PICKPOSITION:TEMPOFFSET  
+               SET_CD_PARAMS (collisionDetecIndex)
+               SetStandardTCP()
+               SetToolBase(TCPNr_WithPart,BaseNr_pick)
+               setAPO(apo_distance)
+               SetVel(v_fast)
+               PTP XPickPosition:OffsetPickApr C_DIS
+            ;ENDFOLD
+            
+
+            
+            TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO KukaPickDoneOff() PRIO = -1 
+            TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO zatrzymajTimer(nrTimerPick) PRIO = -1
+            TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO uruchomTimer(nrTimerPlace) PRIO = -1 
+            
+                       
+            ;FOLD PTP midPick020 CONT
+               SET_CD_PARAMS (collisionDetecIndex)
+               SetStandardTCP()
+               SetToolBase(TCPNr_WithooutPart,BaseNr_main)
+               setAPO(apo_distance)
+               SetVel(v_fast)
+               PTP XmidPick020 C_Dis
+               ;fold teach
+                  CONTINUE
+                  if (teach_mode) then  
+                     TouchUpPoint(XmidPick020)
+                  endif             
+               ;endfold
+            ;ENDFOLD
+     
+            
+            ;FOLD PTP midPick010 CONT
+               SET_CD_PARAMS (collisionDetecIndex)
+               SetStandardTCP()
+               SetToolBase(TCPNr_WithooutPart,BaseNr_main)
+               setAPO(apo_distance)
+               SetVel(v_fast)
+               PTP XmidPick010 C_Dis
+               ;fold teach
+                  CONTINUE
+                  if (teach_mode) then  
+                     TouchUpPoint(XmidPick010)
+                  endif             
+               ;endfold
+            ;ENDFOLD
+            
+         ;ENDFOLD (PICK)
+         TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO KukaReadyToDoseOn() PRIO = -1          
+         TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO Starting(StatNb_DoseA) PRIO = -1 
+         
+      ENDIF ;(picking)
+      
+      if EnableDosing then  
+         
+         ; LOOP
+         
+         TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = -300 DO SetStatusWaitingFor(StatNb_DoseA) PRIO = -1 
+         ;FOLD PTP midDose010 CONT
+            SET_CD_PARAMS (collisionDetecIndex)
+            SetStandardTCP()
+            SetToolBase(TCPNr_WithPart,BaseNr_main)
+            setAPO(apo_distance)
+            SetVel(v_fast)               
+            PTP XmidDose010 C_dis
+            ;fold teach
+               CONTINUE
+               if (teach_mode) then  
+                  TouchUpPoint(XmidDose010)
+               endif             
+            ;endfold
+            
+         ;ENDFOLD
+         
+         WaitForDoseARdy()
+         
+         CONTINUE
+         wait for not workZoneBusy_DoseIN
+         
+         ;FOLD DOSE
+            
+            TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO SetStatusActive(StatNb_DoseA) PRIO = -1    
+            ;FOLD PTP XmidDose020 CONT
+               SET_CD_PARAMS (collisionDetecIndex)
+               SetExtrTCP()
+               SetToolBase(WorkPiece_Dose1Nr,TCPEXT_DoseNr)
+               setAPO(apo_distance)
+               SetVel(v_fast)               
+               PTP XmidDose020 C_dis
+               ;fold teach
+                  CONTINUE
+                  if (teach_mode) then  
+                     TouchUpPoint(XmidDose020)
+                  endif             
+               ;endfold
+            ;ENDFOLD
+            
+            $OV_PRO = OVsetDosing    
+   acc_percent=acc_percent_dosing            
+            ;fold points
+               if FALSE then      
+                  ;FOLD PTP dose_A_1 Vel=100 % PDAT11 Tool[4]:WorkPiece_Dose1 Base[22]:TCPEXT_Dose extTCP  ;%{PE}
+                     ;FOLD Parameters ;%{h}
+                        ;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=dose_A_1; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT11; Kuka.VelocityPtp=100; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+                     ;ENDFOLD
+                     $BWDSTART = FALSE
+                     PDAT_ACT = PPDAT11
+                     FDAT_ACT = Fdose_A_1
+                     BAS(#PTP_PARAMS, 100.0)
+                     SET_CD_PARAMS (0)
+                     PTP Xdose_A_1
+                  ;ENDFOLD
+                  ;FOLD PTP dose_A_2 Vel=100 % PDAT10 Tool[4]:WorkPiece_Dose1 Base[22]:TCPEXT_Dose extTCP  ;%{PE}
+                     ;FOLD Parameters ;%{h}
+                        ;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=dose_A_2; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT10; Kuka.VelocityPtp=100; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+                     ;ENDFOLD
+                     $BWDSTART = FALSE
+                     PDAT_ACT = PPDAT10
+                     FDAT_ACT = Fdose_A_2
+                     BAS(#PTP_PARAMS, 100.0)
+                     SET_CD_PARAMS (0)
+                     PTP Xdose_A_2
+                  ;ENDFOLD
+                  ;FOLD PTP dose_B_1 Vel=100 % PDAT12 Tool[4]:WorkPiece_Dose1 Base[22]:TCPEXT_Dose extTCP  ;%{PE}
+                     ;FOLD Parameters ;%{h}
+                        ;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=dose_B_1; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT12; Kuka.VelocityPtp=100; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+                     ;ENDFOLD
+                     $BWDSTART = FALSE
+                     PDAT_ACT = PPDAT12
+                     FDAT_ACT = Fdose_B_1
+                     BAS(#PTP_PARAMS, 100.0)
+                     SET_CD_PARAMS (0)
+                     PTP Xdose_B_1
+                  ;ENDFOLD
+                  ;FOLD PTP dose_B_2 Vel=100 % PDAT13 Tool[4]:WorkPiece_Dose1 Base[22]:TCPEXT_Dose extTCP  ;%{PE}
+                     ;FOLD Parameters ;%{h}
+                        ;Params IlfProvider=kukaroboter.basistech.inlineforms.movement.old; Kuka.IsGlobalPoint=False; Kuka.PointName=dose_B_2; Kuka.BlendingEnabled=False; Kuka.MoveDataPtpName=PDAT13; Kuka.VelocityPtp=100; Kuka.CurrentCDSetIndex=0; Kuka.MovementParameterFieldEnabled=True; IlfCommand=PTP
+                     ;ENDFOLD
+                     $BWDSTART = FALSE
+                     PDAT_ACT = PPDAT13
+                     FDAT_ACT = Fdose_B_2
+                     BAS(#PTP_PARAMS, 100.0)
+                     SET_CD_PARAMS (0)
+                     PTP Xdose_B_2
+                  ;ENDFOLD
+                  
+               endif
+            ;endfold (points)
+            
+            apo_distance=500 ;???
+            
+            ;FOLD dose_A  
+               
+               ;FOLD PTP dose_A_010
+                  dose_A_offset_010={X -2.0000,Y -2.00000,Z 45.00000,A 0.0,B 0.0,C 0.0}      
+                  
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 50.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_010:Xdose_A_1  C_Dis               
+               ;ENDFOLD 
+               
+               TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = WP1_DelayOnAct DO DosingOn() PRIO = -1          
+               
+               ;FOLD PTP dose_A_020
+                  dose_A_offset_020={X -4.0000,Y -2.5000000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 10.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_020:Xdose_A_1                  
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_030      
+                  dose_A_offset_030={X -5.50000,Y -2.500000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 5.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_030:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_040      
+                  dose_A_offset_040={X 6.50000,Y -4.00000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 3.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_040:Xdose_A_2 C_Dis
+               ;ENDFOLD  
+               
+               ;FOLD PTP dose_A_050      
+                  dose_A_offset_050={X 7.00000,Y 4.00000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 10.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_050:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_060     
+                  dose_A_offset_060={X -5.50000,Y 2.5000000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 5.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_060:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_070      
+                  dose_A_offset_070={X -4.0000,Y 1.000000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 5.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_070:Xdose_A_1 C_Dis
+               ;ENDFOLD  
+               
+               ;FOLD PTP dose_A_080      
+                  dose_A_offset_080={X -2.0000,Y -2.500000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_080:Xdose_A_1 C_Dis
+               ;ENDFOLD  
+               
+               ;FOLD PTP dose_A_090      
+                  dose_A_offset_090={X 2.0000,Y 2.500000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_090:Xdose_A_1 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_100      
+                  dose_A_offset_100={X 5.0000,Y -2.000000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_100:Xdose_A_1 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_105     
+                  dose_A_offset_105={X -9.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_105:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_110     
+                  dose_A_offset_110={X -8.0000,Y 2.00000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_110:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_115      
+                  dose_A_offset_115={X -7.0000,Y 0.0000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_115:Xdose_A_2 C_Dis
+               ;ENDFOLD
+               
+               ;FOLD PTP dose_A_120      
+                  dose_A_offset_120={X -6.0000,Y -4.50000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_120:Xdose_A_2 C_Dis
+               ;ENDFOLD
+               
+               ;FOLD PTP dose_A_125      
+                  dose_A_offset_125={X -5.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_125:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_130      
+                  dose_A_offset_130={X -4.0000,Y 2.500000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_130:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_135      
+                  dose_A_offset_135={X -3.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_135:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_140      
+                  dose_A_offset_140={X -2.0000,Y -5.00000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_140:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_145      
+                  dose_A_offset_145={X -1.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_145:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_150     
+                  dose_A_offset_150={X 0.0000,Y 3.00000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_150:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_155     
+                  dose_A_offset_155={X 2.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_155:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_160     
+                  dose_A_offset_160={X 4.0000,Y -2.500000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_160:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_165     
+                  dose_A_offset_165={X 5.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_165:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_170     
+                  dose_A_offset_170={X 6.0000,Y 2.500000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_170:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_180     
+                  dose_A_offset_180={X 4.50000,Y -2.500000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 10.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_180:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_190     
+                  dose_A_offset_190={X 0.0000,Y 1.500000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_190:Xdose_A_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_A_200      
+                  dose_A_offset_200={X -2.0000,Y -0.500000,Z 1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 50.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_200:Xdose_A_2 C_Dis
+               ;ENDFOLD  
+               
+               TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = WP1_DelayOFFAct DO DosingOff() PRIO = -1   
+               
+               ;FOLD PTP dose_A_210      
+                  dose_A_offset_210={X 2.0000,Y 0.000000,Z 2.00000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 100.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_210:Xdose_A_1 C_Dis
+               ;ENDFOLD  
+               
+               ;FOLD PTP dose_A_220      
+                  dose_A_offset_220={X 0.0000,Y 0.000000,Z 15.00000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 100.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_220:Xdose_A_2 C_Dis
+               ;ENDFOLD  
+               TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO SetStatusDone(StatNb_DoseA) PRIO = -1 
+               TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO DoseADone() PRIO = -1                 
+               ;FOLD PTP dose_A_230      
+                  dose_A_offset_230={X 5.0000,Y 0.000000,Z 25.00000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_A
+                  FDAT_ACT = Fdose_A
+                  BAS(#PTP_PARAMS, 100.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_A_offset_230:Xdose_A_2 C_Dis
+               ;ENDFOLD  
+               
+            ;ENDFOLD (dose_A)
+            
+            ;_____________________
+            TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO SetStatusActive(StatNb_DoseB) PRIO = -1 
+            
+            ;FOLD dose_B  
+               
+               ;FOLD PTP dose_B_010
+                  dose_B_offset_010={X -2.0000,Y -2.00000,Z 45.00000,A 0.0,B 0.0,C 0.0}      
+                  
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 50.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_010:Xdose_B_1  C_Dis               
+               ;ENDFOLD 
+               
+               TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = WP2_DelayOnAct DO DosingOn() PRIO = -1          
+               
+               ;FOLD PTP dose_B_020
+                  dose_B_offset_020={X -4.0000,Y -2.5000000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 10.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_020:Xdose_B_1                  
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_030      
+                  dose_B_offset_030={X -5.50000,Y -2.500000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 5.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_030:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_040      
+                  dose_B_offset_040={X 6.50000,Y -4.00000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 3.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_040:Xdose_B_2 C_Dis
+               ;ENDFOLD  
+               
+               ;FOLD PTP dose_B_050      
+                  dose_B_offset_050={X 7.00000,Y 4.00000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 10.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_050:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_060     
+                  dose_B_offset_060={X -5.50000,Y 2.5000000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 5.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_060:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_070      
+                  dose_B_offset_070={X -4.0000,Y 1.000000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 5.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_070:Xdose_B_1 C_Dis
+               ;ENDFOLD  
+               
+               ;FOLD PTP dose_B_080      
+                  dose_B_offset_080={X -2.0000,Y -2.500000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_080:Xdose_B_1 C_Dis
+               ;ENDFOLD  
+               
+               ;FOLD PTP dose_B_090      
+                  dose_B_offset_090={X 2.0000,Y 2.500000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_090:Xdose_B_1 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_100      
+                  dose_B_offset_100={X 5.0000,Y -2.000000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_100:Xdose_B_1 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_105     
+                  dose_B_offset_105={X -9.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_105:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_110     
+                  dose_B_offset_110={X -8.0000,Y 2.00000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_110:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_115      
+                  dose_B_offset_115={X -7.0000,Y 0.0000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_115:Xdose_B_2 C_Dis
+               ;ENDFOLD
+               
+               ;FOLD PTP dose_B_120      
+                  dose_B_offset_120={X -6.0000,Y -4.50000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_120:Xdose_B_2 C_Dis
+               ;ENDFOLD
+               
+               ;FOLD PTP dose_B_125      
+                  dose_B_offset_125={X -5.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_125:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_130      
+                  dose_B_offset_130={X -4.0000,Y 2.500000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_130:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_135      
+                  dose_B_offset_135={X -3.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_135:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_140      
+                  dose_B_offset_140={X -2.0000,Y -5.00000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_140:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_145      
+                  dose_B_offset_145={X -1.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_145:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_150     
+                  dose_B_offset_150={X 0.0000,Y 3.00000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_150:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_155     
+                  dose_B_offset_155={X 2.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_155:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_160     
+                  dose_B_offset_160={X 4.0000,Y -2.500000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_160:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_165     
+                  dose_B_offset_165={X 5.0000,Y 0.00000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_165:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_170     
+                  dose_B_offset_170={X 6.0000,Y 2.500000,Z -1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_170:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_180     
+                  dose_B_offset_180={X 4.50000,Y -2.500000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 10.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_180:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_190     
+                  dose_B_offset_190={X 0.0000,Y 1.500000,Z 0.50000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 20.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_190:Xdose_B_2 C_Dis
+               ;ENDFOLD 
+               
+               ;FOLD PTP dose_B_200      
+                  dose_B_offset_200={X -2.0000,Y -0.500000,Z 1.0000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 50.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_200:Xdose_B_2 C_Dis
+               ;ENDFOLD  
+               
+               TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = WP2_DelayOFFAct DO DosingOff() PRIO = -1   
+               
+               ;FOLD PTP dose_B_210      
+                  dose_B_offset_210={X 2.0000,Y 0.000000,Z 2.00000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 100.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_210:Xdose_B_1 C_Dis
+               ;ENDFOLD  
+               
+               ;FOLD PTP dose_B_220      
+                  dose_B_offset_220={X 0.0000,Y 0.000000,Z 15.00000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 100.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_220:Xdose_B_2 C_Dis
+               ;ENDFOLD  
+               TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO SetStatusDone(StatNb_DoseB) PRIO = -1 
+               TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO DoseBDone() PRIO = -1                 
+               ;FOLD PTP dose_B_230      
+                  dose_B_offset_230={X 5.0000,Y 0.000000,Z 25.00000,A 0.0,B 0.0,C 0.0}      
+                  $BWDSTART = FALSE
+                  PDAT_ACT = PPDATdose_B
+                  FDAT_ACT = Fdose_B
+                  BAS(#PTP_PARAMS, 100.0)
+                  SET_CD_PARAMS (0)
+                  PTP dose_B_offset_230:Xdose_B_2 C_Dis
+               ;ENDFOLD  
+               
+            ;ENDFOLD (dose_B)
+            
+            ;_____________________
+            $OV_PRO = OVsetPicking  
+            acc_percent=acc_percent_cycle
+            
+            ;FOLD PTP midDose020 CONT
+               SET_CD_PARAMS (collisionDetecIndex)
+               SetExtrTCP()
+               SetToolBase(WorkPiece_Dose1Nr,TCPEXT_DoseNr)
+               setAPO(apo_distance)
+               SetVel(v_fast)               
+               PTP XmidDose020 C_dis
+               ;fold teach
+                  CONTINUE
+                  if (teach_mode) then  
+                     TouchUpPoint(XmidDose020)
+                  endif             
+               ;endfold
+               
+            ;endfold (DOSE)
+            
+         ;ENDFOLD (DOSE)          
+         
+         ; ENDLOOP 
+         
+      ENDIF
+      
+      TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = -100 DO Starting(StatNb_Drop) PRIO = -1 
+      TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO SetStatusWaitingFor(StatNb_Drop) PRIO = -1 
+      ;FOLD PTP midDose030 CONT
+         SET_CD_PARAMS (collisionDetecIndex)
+         SetStandardTCP()
+         SetToolBase(TCPNr_WithPart,BaseNr_main)
+         setAPO(apo_distance)
+         SetVel(v_fast)               
+         PTP XmidDose030 C_dis
+         ;fold teach
+            CONTINUE
+            if (teach_mode) then  
+               TouchUpPoint(XmidDose030)
+            endif             
+         ;endfold
+         
+      ;ENDFOLD
+      
+      CONTINUE
+      if not PLCDropAReady THEN   
+         ;FOLD PTP midDrop010 CONT
+            SET_CD_PARAMS (collisionDetecIndex)
+            SetStandardTCP()
+            SetToolBase(TCPNr_WithPart,BaseNr_main)
+            setAPO(apo_distance)
+            SetVel(v_fast)               
+            PTP XmidDrop010 C_dis
+            ;fold teach
+               CONTINUE
+               if (teach_mode) then  
+                  TouchUpPoint(XmidDrop010)
+               endif             
+            ;endfold
+            
+         ;ENDFOLD
+         
+         ;FOLD PTP midDrop015 CONT
+            SET_CD_PARAMS (collisionDetecIndex)
+            SetStandardTCP()
+            SetToolBase(TCPNr_WithPart,BaseNr_main)
+            setAPO(apo_distance)
+            SetVel(v_fast)               
+            PTP XmidDrop015 C_dis
+            ;fold teach
+               CONTINUE
+               if (teach_mode) then  
+                  TouchUpPoint(XmidDrop015)
+               endif             
+            ;endfold
+            
+         ;ENDFOLD  
+         
+      endif
+      
+      WaitForDropARdy()
+      ;FOLD DROP
+         
+         WaitForDropARdy()
+         checkDropPos()
+         DropToolOffset_appr()
+         
+         CONTINUE
+         wait for not workZoneBusy_DropIN
+         
+         TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO SetStatusActive(StatNb_Drop) PRIO = -1        
+         ;FOLD PTP RELTOOL DROPPOSITION:TEMPOFFSET  
+            SET_CD_PARAMS (collisionDetecIndex)
+            SetStandardTCP()
+            SetToolBase(TCPNr_WithPart,BaseNr_drop)
+            setAPO(apo_distance)
+            SetVel(v_fast)
+            PTP XDropPosition:OffsetDropApr C_DIS
+         ;ENDFOLD
+         
+         ;FOLD LIN DropPosition CONT            
+            SET_CD_PARAMS (collisionDetecIndex) 
+            SetStandardTCP()
+            SetToolBase(TCPNr_WithPart,BaseNr_drop)
+            SetVel(v_mid)
+            LIN XDropPosition            
+            ;fold teach
+               CONTINUE
+               if (teach_mode) then  
+                  XDropPosition = $POS_ACT
+                  TouchUpPoint(dropPositions[currentType,currentPlaceIndex].point)
+                  dropPositions[currentType,currentPlaceIndex].correction = pos_offset_zero
+               endif             
+            ;endfold               
+            
+         ;ENDFOLD
+         
+         wait sec 0
+         
+         GripperOpenCheck()
+         partInGripperOFF()
+         wait sec 0.2
+         SetStatusDone(StatNb_Drop) 
+         DropADone() 
+         MonitorDropAdoneACKOn()
+         
+         TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO KukaReadyToPickOn() PRIO = -1          
+         ;FOLD PTP RELTOOL DROPPOSITION:TEMPOFFSET            
+            SET_CD_PARAMS (collisionDetecIndex) 
+            SetStandardTCP()
+            SetToolBase(TCPNr_WithooutPart,BaseNr_drop)
+            setAPO(apo_distance)
+            SetVel(v_mid)
+            PTP XDropPosition:OffsetDropApr C_DIS
+         ;ENDFOLD            
+         
+         TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO zatrzymajTimer(nrTimerPlace) PRIO = -1 
+         TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO zatrzymajTimer(nrTimerTotalCycle) PRIO = -1        
+         TRIGGER WHEN distance=TriggnerONFollowPnt DELAY = 0 DO KukaDropDoneOff() PRIO = -1 
+         
+         ;FOLD PTP midDrop020 CONT
+            SET_CD_PARAMS (collisionDetecIndex)
+            SetStandardTCP()
+            SetToolBase(TCPNr_WithooutPart,BaseNr_main)
+            setAPO(apo_distance)
+            SetVel(v_fast)               
+            PTP XmidDrop020 C_dis
+            ;fold teach
+               CONTINUE
+               if (teach_mode) then  
+                  TouchUpPoint(XmidDrop020)
+               endif             
+            ;endfold
+            
+         ;ENDFOLD 
+         
+         $OV_PRO = OVsetPicking
+         
+         ENDLOOP
+         
+         CycleWithNewType=FALSE
+         
+      ;endfold (DROP)
+      
+      end
+      
+      def DropToolOffset_appr()
+         OffsetDropApr = pos_offset_zero                
+         OffsetDropApr.z=dropPositions[currentType,currentPlaceIndex].offset
+      end
+      def PickToolOffset_appr()
+         OffsetPickApr = pos_offset_zero                
+         OffsetPickApr.z=pickPositions[currentType,1,1].offset
+      end 
+      
+      global def waitForPartAndCoordinate()
+         
+         WaitingForPickBRdy() 
+         CONTINUE
+         
+         zatrzymajTimer(nrTimerWaitngForPart)
+         zatrzymajWyzerujTimer(nrTimerWaitngForPart)
+         
+      end
+      
