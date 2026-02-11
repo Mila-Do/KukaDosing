@@ -355,13 +355,70 @@ export function generateChartHtml(
       }
     };
 
-    // Initialize both charts
-    Plotly.newPlot('chart2D', traces, layout, config);
-    Plotly.newPlot('chart3D', traces3D, layout3D, config3D);
-    
     // Shared Animation State
     const trajectoryData2D = ${trajectory ? JSON.stringify(trajectory.points) : 'null'};
     const trajectoryData3D = ${trajectory3D ? JSON.stringify(trajectory3D.points) : 'null'};
+    
+    // Add animation traces BEFORE initializing charts
+    if (trajectoryData2D && trajectoryData2D.length > 0) {
+      traces.push({
+        x: [],
+        y: [],
+        mode: 'lines',
+        type: 'scatter',
+        name: 'Trajectory',
+        line: { color: '#f59e0b', width: 2 },
+        hoverinfo: 'skip',
+      });
+      traces.push({
+        x: [],
+        y: [],
+        mode: 'markers',
+        type: 'scatter',
+        name: 'Current Point',
+        marker: {
+          size: 14,
+          color: '#ef4444',
+          symbol: 'star',
+          line: { width: 2, color: '#dc2626' }
+        },
+        text: [],
+        hoverinfo: 'skip',
+      });
+    }
+    
+    if (trajectoryData3D && trajectoryData3D.length > 0) {
+      traces3D.push({
+        x: [],
+        y: [],
+        z: [],
+        mode: 'lines',
+        type: 'scatter3d',
+        name: 'Trajectory',
+        line: { color: '#f59e0b', width: 4 },
+        hoverinfo: 'skip',
+      });
+      traces3D.push({
+        x: [],
+        y: [],
+        z: [],
+        mode: 'markers',
+        type: 'scatter3d',
+        name: 'Current Point',
+        marker: {
+          size: 8,
+          color: '#ef4444',
+          symbol: 'diamond',
+          line: { width: 2, color: '#dc2626' }
+        },
+        text: [],
+        hoverinfo: 'skip',
+      });
+    }
+
+    // NOW initialize both charts with complete traces
+    Plotly.newPlot('chart2D', traces, layout, config);
+    Plotly.newPlot('chart3D', traces3D, layout3D, config3D);
     let currentFrame = 0;
     let isPlaying = false;
     let animationSpeed = 1; // 1x = 500ms per frame
@@ -392,44 +449,12 @@ export function generateChartHtml(
       }
       
       // Update 2D animation
-      if (trajectoryData2D) {
+      if (trajectoryData2D && traces.length >= 6) {
         const segment2D = trajectoryData2D.slice(0, currentFrame + 1);
         const currentPoint2D = trajectoryData2D[currentFrame];
         
         const pathX = segment2D.map(p => p.x);
         const pathY = segment2D.map(p => p.y);
-        
-        // Add trajectory trace if not exists
-        if (traces.length === 4) {
-          traces.push({
-            x: [],
-            y: [],
-            mode: 'lines',
-            type: 'scatter',
-            name: 'Trajectory',
-            line: { color: '#f59e0b', width: 2 },
-            hoverinfo: 'skip',
-          });
-        }
-        
-        // Add current point highlight if not exists
-        if (traces.length === 5) {
-          traces.push({
-            x: [],
-            y: [],
-            mode: 'markers',
-            type: 'scatter',
-            name: 'Current Point',
-            marker: {
-              size: 14,
-              color: '#ef4444',
-              symbol: 'star',
-              line: { width: 2, color: '#dc2626' }
-            },
-            text: [],
-            hovertemplate: '<b>%{text}</b><br>Frame: ' + currentFrame + '<extra></extra>',
-          });
-        }
         
         // Update traces
         traces[4].x = pathX;
@@ -438,51 +463,22 @@ export function generateChartHtml(
         traces[5].y = [currentPoint2D.y];
         traces[5].text = [currentPoint2D.name];
         
-        Plotly.react('chart2D', traces, layout, config);
+        // Use restyle to preserve user interactions (zoom, pan)
+        Plotly.restyle('chart2D', {
+          x: [pathX, [currentPoint2D.x]],
+          y: [pathY, [currentPoint2D.y]],
+          text: [null, [currentPoint2D.name]]
+        }, [4, 5]);
       }
       
       // Update 3D animation
-      if (trajectoryData3D) {
+      if (trajectoryData3D && traces3D.length >= 6) {
         const segment3D = trajectoryData3D.slice(0, currentFrame + 1);
         const currentPoint3D = trajectoryData3D[currentFrame];
         
         const pathX3D = segment3D.map(p => p.x);
         const pathY3D = segment3D.map(p => p.y);
         const pathZ3D = segment3D.map(p => p.z);
-        
-        // Add trajectory trace if not exists
-        if (traces3D.length === 4) {
-          traces3D.push({
-            x: [],
-            y: [],
-            z: [],
-            mode: 'lines',
-            type: 'scatter3d',
-            name: 'Trajectory',
-            line: { color: '#f59e0b', width: 4 },
-            hoverinfo: 'skip',
-          });
-        }
-        
-        // Add current point highlight if not exists
-        if (traces3D.length === 5) {
-          traces3D.push({
-            x: [],
-            y: [],
-            z: [],
-            mode: 'markers',
-            type: 'scatter3d',
-            name: 'Current Point',
-            marker: {
-              size: 8,
-              color: '#ef4444',
-              symbol: 'diamond',
-              line: { width: 2, color: '#dc2626' }
-            },
-            text: [],
-            hovertemplate: '<b>%{text}</b><br>Frame: ' + currentFrame + '<extra></extra>',
-          });
-        }
         
         // Update traces
         traces3D[4].x = pathX3D;
@@ -493,7 +489,13 @@ export function generateChartHtml(
         traces3D[5].z = [currentPoint3D.z];
         traces3D[5].text = [currentPoint3D.name];
         
-        Plotly.react('chart3D', traces3D, layout3D, config3D);
+        // Use restyle to preserve 3D camera orientation
+        Plotly.restyle('chart3D', {
+          x: [pathX3D, [currentPoint3D.x]],
+          y: [pathY3D, [currentPoint3D.y]],
+          z: [pathZ3D, [currentPoint3D.z]],
+          text: [null, [currentPoint3D.name]]
+        }, [4, 5]);
       }
       
       // Update progress
@@ -546,12 +548,22 @@ export function generateChartHtml(
       pause();
       currentFrame = 0;
       
-      // Remove animation traces from both views
-      if (traces.length > 4) {
-        traces.splice(4);
+      // Clear animation trace data (but keep the traces)
+      if (traces.length >= 6) {
+        traces[4].x = [];
+        traces[4].y = [];
+        traces[5].x = [];
+        traces[5].y = [];
+        traces[5].text = [];
       }
-      if (traces3D.length > 4) {
-        traces3D.splice(4);
+      if (traces3D.length >= 6) {
+        traces3D[4].x = [];
+        traces3D[4].y = [];
+        traces3D[4].z = [];
+        traces3D[5].x = [];
+        traces3D[5].y = [];
+        traces3D[5].z = [];
+        traces3D[5].text = [];
       }
       
       Plotly.react('chart2D', traces, layout, config);
