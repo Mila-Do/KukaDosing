@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KUKA Dispensing Points - 2D Visualization</title>
+  <title>KUKA Dispensing Points - 2D/3D Visualization</title>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
   <style>
     body {
@@ -13,13 +13,38 @@
       background: #f5f5f5;
     }
     .container {
-      max-width: 1400px;
+      max-width: 1600px;
       margin: 0 auto;
+      width: 95%;
     }
     h1 {
       text-align: center;
       color: #333;
-      margin-bottom: 30px;
+      margin-bottom: 10px;
+    }
+    .view-switcher {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .view-btn {
+      padding: 10px 30px;
+      border: 2px solid #3b82f6;
+      border-radius: 6px;
+      background: white;
+      color: #3b82f6;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .view-btn:hover {
+      background: #eff6ff;
+    }
+    .view-btn.active {
+      background: #3b82f6;
+      color: white;
     }
     .stats {
       display: flex;
@@ -35,12 +60,22 @@
       font-weight: bold;
       color: #333;
     }
-    #chart {
+    .chart-container {
       background: white;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       padding: 20px;
       margin-bottom: 20px;
+    }
+    #chart2D, #chart3D {
+      min-height: 700px;
+      height: 80vh;
+    }
+    .chart-view {
+      display: none;
+    }
+    .chart-view.active {
+      display: block;
     }
     .animation-controls {
       background: white;
@@ -117,7 +152,13 @@
 </head>
 <body>
   <div class="container">
-    <h1>KUKA Dispensing Points - 2D Visualization</h1>
+    <h1>KUKA Dispensing Points Visualization</h1>
+    
+    <div class="view-switcher">
+      <button class="view-btn active" id="btn2D" onclick="switchView('2D')">2D View</button>
+      <button class="view-btn" id="btn3D" onclick="switchView('3D')">3D View</button>
+    </div>
+    
     <div class="stats">
       <div class="stat-item">
         Base Points: <span class="stat-value">4</span>
@@ -154,7 +195,10 @@
       </div>
     </div>
     
-    <div id="chart"></div>
+    <div class="chart-container">
+      <div id="chart2D" class="chart-view active"></div>
+      <div id="chart3D" class="chart-view"></div>
+    </div>
   </div>
   <script>
     const traces = [
@@ -249,8 +293,8 @@
       hovermode: 'closest',
       showlegend: true,
       legend: {
-        x: 1.02,
-        y: 1,
+        x: 0.02,
+        y: 0.98,
         xanchor: 'left',
         yanchor: 'top',
         bgcolor: 'rgba(255, 255, 255, 0.9)',
@@ -259,7 +303,8 @@
       },
       plot_bgcolor: '#fafafa',
       paper_bgcolor: 'white',
-      margin: { t: 40, b: 60, l: 60, r: 150 },
+      margin: { t: 10, b: 50, l: 60, r: 20 },
+      autosize: true,
     };
 
     const config = {
@@ -269,88 +314,185 @@
       modeBarButtonsToRemove: ['lasso2d', 'select2d'],
       toImageButtonOptions: {
         format: 'png',
-        filename: 'kuka_dispensing_points',
+        filename: 'kuka_dispensing_points_2d',
         height: 1080,
         width: 1920,
         scale: 2
       }
     };
 
-    Plotly.newPlot('chart', traces, layout, config);
+    // 3D Traces and Layout
+    const traces3D = [{"x":[17,31],"y":[3,3],"z":[0.274462,2.95810342],"mode":"markers+text","type":"scatter3d","name":"Base Points A","marker":{"size":8,"color":"#3b82f6","symbol":"circle","line":{"width":2,"color":"#1d4ed8"}},"text":["Xdose_A_1","Xdose_A_2"],"textposition":"top center","textfont":{"size":10,"color":"#1d4ed8"},"hovertemplate":"<b>%{text}</b><br>X: %{x:.2f}<br>Y: %{y:.2f}<br>Z: %{z:.2f}<extra></extra>"},{"x":[17,31],"y":[-5,-7],"z":[0.168337673,2.99627256],"mode":"markers+text","type":"scatter3d","name":"Base Points B","marker":{"size":8,"color":"#10b981","symbol":"square","line":{"width":2,"color":"#059669"}},"text":["Xdose_B_1","Xdose_B_2"],"textposition":"top center","textfont":{"size":10,"color":"#059669"},"hovertemplate":"<b>%{text}</b><br>X: %{x:.2f}<br>Y: %{y:.2f}<br>Z: %{z:.2f}<extra></extra>"},{"x":[15,13,25.5,37.5,38,25.5,13,15,19,22,22,23,24,25,26,27,28,29,30,31,33,35,36,37,35.5,31,29,19,31,36],"y":[1,0.5,0.5,-1,7,5.5,4,0.5,5.5,1,3,5,3,-1.5,3,5.5,3,-2,3,6,3,0.5,3,5.5,0.5,4.5,2.5,3,3,3],"z":[45.274462,0.774462,1.95810342,1.95810342,1.95810342,1.95810342,0.774462,0.774462,0.774462,0.774462,3.45810342,1.95810342,3.45810342,1.95810342,3.45810342,1.95810342,3.45810342,1.95810342,3.45810342,1.95810342,3.45810342,1.95810342,3.45810342,1.95810342,3.45810342,3.45810342,3.95810342,2.2744619999999998,17.95810342,27.95810342],"mode":"markers","type":"scatter3d","name":"Offsets A","marker":{"size":3,"color":"#93c5fd","symbol":"circle","line":{"width":0.5,"color":"#3b82f6"}},"text":["dose_A_offset_010","dose_A_offset_020","dose_A_offset_030","dose_A_offset_040","dose_A_offset_050","dose_A_offset_060","dose_A_offset_070","dose_A_offset_080","dose_A_offset_090","dose_A_offset_100","dose_A_offset_105","dose_A_offset_110","dose_A_offset_115","dose_A_offset_120","dose_A_offset_125","dose_A_offset_130","dose_A_offset_135","dose_A_offset_140","dose_A_offset_145","dose_A_offset_150","dose_A_offset_155","dose_A_offset_160","dose_A_offset_165","dose_A_offset_170","dose_A_offset_180","dose_A_offset_190","dose_A_offset_200","dose_A_offset_210","dose_A_offset_220","dose_A_offset_230"],"customdata":["Xdose_A_1","Xdose_A_1","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_1","Xdose_A_1","Xdose_A_1","Xdose_A_1","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_2","Xdose_A_1","Xdose_A_2","Xdose_A_2"],"hovertemplate":"<b>%{text}</b><br>X: %{x:.2f}<br>Y: %{y:.2f}<br>Z: %{z:.2f}<br>Base: %{customdata}<extra></extra>"},{"x":[15,13,25.5,37.5,38,25.5,13,15,19,22,22,23,24,25,26,27,28,29,30,31,33,35,36,37,35.5,31,29,19,31,36],"y":[-7,-7.5,-9.5,-11,-3,-4.5,-4,-7.5,-2.5,-7,-7,-5,-7,-11.5,-7,-4.5,-7,-12,-7,-4,-7,-9.5,-7,-4.5,-9.5,-5.5,-7.5,-5,-7,-7],"z":[45.168337673,0.668337673,1.99627256,1.99627256,1.99627256,1.99627256,0.668337673,0.668337673,0.668337673,0.668337673,3.49627256,1.99627256,3.49627256,1.99627256,3.49627256,1.99627256,3.49627256,1.99627256,3.49627256,1.99627256,3.49627256,1.99627256,3.49627256,1.99627256,3.49627256,3.49627256,3.99627256,2.168337673,17.99627256,27.99627256],"mode":"markers","type":"scatter3d","name":"Offsets B","marker":{"size":3,"color":"#6ee7b7","symbol":"square","line":{"width":0.5,"color":"#10b981"}},"text":["dose_B_offset_010","dose_B_offset_020","dose_B_offset_030","dose_B_offset_040","dose_B_offset_050","dose_B_offset_060","dose_B_offset_070","dose_B_offset_080","dose_B_offset_090","dose_B_offset_100","dose_B_offset_105","dose_B_offset_110","dose_B_offset_115","dose_B_offset_120","dose_B_offset_125","dose_B_offset_130","dose_B_offset_135","dose_B_offset_140","dose_B_offset_145","dose_B_offset_150","dose_B_offset_155","dose_B_offset_160","dose_B_offset_165","dose_B_offset_170","dose_B_offset_180","dose_B_offset_190","dose_B_offset_200","dose_B_offset_210","dose_B_offset_220","dose_B_offset_230"],"customdata":["Xdose_B_1","Xdose_B_1","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_1","Xdose_B_1","Xdose_B_1","Xdose_B_1","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_2","Xdose_B_1","Xdose_B_2","Xdose_B_2"],"hovertemplate":"<b>%{text}</b><br>X: %{x:.2f}<br>Y: %{y:.2f}<br>Z: %{z:.2f}<br>Base: %{customdata}<extra></extra>"}];
+    const layout3D = {"title":"","scene":{"xaxis":{"title":"X Position (mm)","gridcolor":"#e5e7eb","showgrid":true,"backgroundcolor":"#fafafa"},"yaxis":{"title":"Y Position (mm)","gridcolor":"#e5e7eb","showgrid":true,"backgroundcolor":"#fafafa"},"zaxis":{"title":"Z Position (mm)","gridcolor":"#e5e7eb","showgrid":true,"backgroundcolor":"#fafafa"},"camera":{"eye":{"x":1.5,"y":1.5,"z":1.2},"center":{"x":0,"y":0,"z":0}},"aspectmode":"auto"},"hovermode":"closest","showlegend":true,"legend":{"x":0.02,"y":0.98,"xanchor":"left","yanchor":"top","bgcolor":"rgba(255, 255, 255, 0.9)","bordercolor":"#e5e7eb","borderwidth":1},"plot_bgcolor":"#fafafa","paper_bgcolor":"white","margin":{"t":10,"b":10,"l":10,"r":10},"autosize":true};
+    const config3D = {
+      responsive: true,
+      displayModeBar: true,
+      displaylogo: false,
+      toImageButtonOptions: {
+        format: 'png',
+        filename: 'kuka_dispensing_points_3d',
+        height: 1080,
+        width: 1920,
+        scale: 2
+      }
+    };
+
+    // Initialize both charts
+    Plotly.newPlot('chart2D', traces, layout, config);
+    Plotly.newPlot('chart3D', traces3D, layout3D, config3D);
     
-    // Animation State
-    const trajectoryData = [{"name":"dose_A_offset_010","x":15,"y":1,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":0,"instructionType":"PTP"},{"name":"dose_A_offset_020","x":13,"y":0.5,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":1,"instructionType":"PTP"},{"name":"dose_A_offset_030","x":25.5,"y":0.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":2,"instructionType":"PTP"},{"name":"dose_A_offset_040","x":37.5,"y":-1,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":3,"instructionType":"PTP"},{"name":"dose_A_offset_050","x":38,"y":7,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":4,"instructionType":"PTP"},{"name":"dose_A_offset_060","x":25.5,"y":5.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":5,"instructionType":"PTP"},{"name":"dose_A_offset_070","x":13,"y":4,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":6,"instructionType":"PTP"},{"name":"dose_A_offset_080","x":15,"y":0.5,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":7,"instructionType":"PTP"},{"name":"dose_A_offset_090","x":19,"y":5.5,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":8,"instructionType":"PTP"},{"name":"dose_A_offset_100","x":22,"y":1,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":9,"instructionType":"PTP"},{"name":"dose_A_offset_105","x":22,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":10,"instructionType":"PTP"},{"name":"dose_A_offset_110","x":23,"y":5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":11,"instructionType":"PTP"},{"name":"dose_A_offset_115","x":24,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":12,"instructionType":"PTP"},{"name":"dose_A_offset_120","x":25,"y":-1.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":13,"instructionType":"PTP"},{"name":"dose_A_offset_125","x":26,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":14,"instructionType":"PTP"},{"name":"dose_A_offset_130","x":27,"y":5.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":15,"instructionType":"PTP"},{"name":"dose_A_offset_135","x":28,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":16,"instructionType":"PTP"},{"name":"dose_A_offset_140","x":29,"y":-2,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":17,"instructionType":"PTP"},{"name":"dose_A_offset_145","x":30,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":18,"instructionType":"PTP"},{"name":"dose_A_offset_150","x":31,"y":6,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":19,"instructionType":"PTP"},{"name":"dose_A_offset_155","x":33,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":20,"instructionType":"PTP"},{"name":"dose_A_offset_160","x":35,"y":0.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":21,"instructionType":"PTP"},{"name":"dose_A_offset_165","x":36,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":22,"instructionType":"PTP"},{"name":"dose_A_offset_170","x":37,"y":5.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":23,"instructionType":"PTP"},{"name":"dose_A_offset_180","x":35.5,"y":0.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":24,"instructionType":"PTP"},{"name":"dose_A_offset_190","x":31,"y":4.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":25,"instructionType":"PTP"},{"name":"dose_A_offset_200","x":29,"y":2.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":26,"instructionType":"PTP"},{"name":"dose_A_offset_210","x":19,"y":3,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":27,"instructionType":"PTP"},{"name":"dose_A_offset_220","x":31,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":28,"instructionType":"PTP"},{"name":"dose_A_offset_230","x":36,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":29,"instructionType":"PTP"},{"name":"dose_B_offset_010","x":15,"y":-7,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":30,"instructionType":"PTP"},{"name":"dose_B_offset_020","x":13,"y":-7.5,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":31,"instructionType":"PTP"},{"name":"dose_B_offset_030","x":25.5,"y":-9.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":32,"instructionType":"PTP"},{"name":"dose_B_offset_040","x":37.5,"y":-11,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":33,"instructionType":"PTP"},{"name":"dose_B_offset_050","x":38,"y":-3,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":34,"instructionType":"PTP"},{"name":"dose_B_offset_060","x":25.5,"y":-4.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":35,"instructionType":"PTP"},{"name":"dose_B_offset_070","x":13,"y":-4,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":36,"instructionType":"PTP"},{"name":"dose_B_offset_080","x":15,"y":-7.5,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":37,"instructionType":"PTP"},{"name":"dose_B_offset_090","x":19,"y":-2.5,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":38,"instructionType":"PTP"},{"name":"dose_B_offset_100","x":22,"y":-7,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":39,"instructionType":"PTP"},{"name":"dose_B_offset_105","x":22,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":40,"instructionType":"PTP"},{"name":"dose_B_offset_110","x":23,"y":-5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":41,"instructionType":"PTP"},{"name":"dose_B_offset_115","x":24,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":42,"instructionType":"PTP"},{"name":"dose_B_offset_120","x":25,"y":-11.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":43,"instructionType":"PTP"},{"name":"dose_B_offset_125","x":26,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":44,"instructionType":"PTP"},{"name":"dose_B_offset_130","x":27,"y":-4.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":45,"instructionType":"PTP"},{"name":"dose_B_offset_135","x":28,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":46,"instructionType":"PTP"},{"name":"dose_B_offset_140","x":29,"y":-12,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":47,"instructionType":"PTP"},{"name":"dose_B_offset_145","x":30,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":48,"instructionType":"PTP"},{"name":"dose_B_offset_150","x":31,"y":-4,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":49,"instructionType":"PTP"},{"name":"dose_B_offset_155","x":33,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":50,"instructionType":"PTP"},{"name":"dose_B_offset_160","x":35,"y":-9.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":51,"instructionType":"PTP"},{"name":"dose_B_offset_165","x":36,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":52,"instructionType":"PTP"},{"name":"dose_B_offset_170","x":37,"y":-4.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":53,"instructionType":"PTP"},{"name":"dose_B_offset_180","x":35.5,"y":-9.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":54,"instructionType":"PTP"},{"name":"dose_B_offset_190","x":31,"y":-5.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":55,"instructionType":"PTP"},{"name":"dose_B_offset_200","x":29,"y":-7.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":56,"instructionType":"PTP"},{"name":"dose_B_offset_210","x":19,"y":-5,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":57,"instructionType":"PTP"},{"name":"dose_B_offset_220","x":31,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":58,"instructionType":"PTP"},{"name":"dose_B_offset_230","x":36,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":59,"instructionType":"PTP"}];
+    // Initialize animation traces if trajectory data exists
+    if (trajectoryData2D && trajectoryData2D.length > 0) {
+      // Add empty trajectory and current point traces to 2D
+      traces.push({
+        x: [],
+        y: [],
+        mode: 'lines',
+        type: 'scatter',
+        name: 'Trajectory',
+        line: { color: '#f59e0b', width: 2 },
+        hoverinfo: 'skip',
+      });
+      traces.push({
+        x: [],
+        y: [],
+        mode: 'markers',
+        type: 'scatter',
+        name: 'Current Point',
+        marker: {
+          size: 14,
+          color: '#ef4444',
+          symbol: 'star',
+          line: { width: 2, color: '#dc2626' }
+        },
+        text: [],
+        hoverinfo: 'skip',
+      });
+    }
+    
+    if (trajectoryData3D && trajectoryData3D.length > 0) {
+      // Add empty trajectory and current point traces to 3D
+      traces3D.push({
+        x: [],
+        y: [],
+        z: [],
+        mode: 'lines',
+        type: 'scatter3d',
+        name: 'Trajectory',
+        line: { color: '#f59e0b', width: 4 },
+        hoverinfo: 'skip',
+      });
+      traces3D.push({
+        x: [],
+        y: [],
+        z: [],
+        mode: 'markers',
+        type: 'scatter3d',
+        name: 'Current Point',
+        marker: {
+          size: 8,
+          color: '#ef4444',
+          symbol: 'diamond',
+          line: { width: 2, color: '#dc2626' }
+        },
+        text: [],
+        hoverinfo: 'skip',
+      });
+    }
+    
+    // Shared Animation State
+    const trajectoryData2D = [{"name":"dose_A_offset_010","x":15,"y":1,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":0,"instructionType":"PTP"},{"name":"dose_A_offset_020","x":13,"y":0.5,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":1,"instructionType":"PTP"},{"name":"dose_A_offset_030","x":25.5,"y":0.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":2,"instructionType":"PTP"},{"name":"dose_A_offset_040","x":37.5,"y":-1,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":3,"instructionType":"PTP"},{"name":"dose_A_offset_050","x":38,"y":7,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":4,"instructionType":"PTP"},{"name":"dose_A_offset_060","x":25.5,"y":5.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":5,"instructionType":"PTP"},{"name":"dose_A_offset_070","x":13,"y":4,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":6,"instructionType":"PTP"},{"name":"dose_A_offset_080","x":15,"y":0.5,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":7,"instructionType":"PTP"},{"name":"dose_A_offset_090","x":19,"y":5.5,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":8,"instructionType":"PTP"},{"name":"dose_A_offset_100","x":22,"y":1,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":9,"instructionType":"PTP"},{"name":"dose_A_offset_105","x":22,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":10,"instructionType":"PTP"},{"name":"dose_A_offset_110","x":23,"y":5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":11,"instructionType":"PTP"},{"name":"dose_A_offset_115","x":24,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":12,"instructionType":"PTP"},{"name":"dose_A_offset_120","x":25,"y":-1.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":13,"instructionType":"PTP"},{"name":"dose_A_offset_125","x":26,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":14,"instructionType":"PTP"},{"name":"dose_A_offset_130","x":27,"y":5.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":15,"instructionType":"PTP"},{"name":"dose_A_offset_135","x":28,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":16,"instructionType":"PTP"},{"name":"dose_A_offset_140","x":29,"y":-2,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":17,"instructionType":"PTP"},{"name":"dose_A_offset_145","x":30,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":18,"instructionType":"PTP"},{"name":"dose_A_offset_150","x":31,"y":6,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":19,"instructionType":"PTP"},{"name":"dose_A_offset_155","x":33,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":20,"instructionType":"PTP"},{"name":"dose_A_offset_160","x":35,"y":0.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":21,"instructionType":"PTP"},{"name":"dose_A_offset_165","x":36,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":22,"instructionType":"PTP"},{"name":"dose_A_offset_170","x":37,"y":5.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":23,"instructionType":"PTP"},{"name":"dose_A_offset_180","x":35.5,"y":0.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":24,"instructionType":"PTP"},{"name":"dose_A_offset_190","x":31,"y":4.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":25,"instructionType":"PTP"},{"name":"dose_A_offset_200","x":29,"y":2.5,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":26,"instructionType":"PTP"},{"name":"dose_A_offset_210","x":19,"y":3,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":27,"instructionType":"PTP"},{"name":"dose_A_offset_220","x":31,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":28,"instructionType":"PTP"},{"name":"dose_A_offset_230","x":36,"y":3,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":29,"instructionType":"PTP"},{"name":"dose_B_offset_010","x":15,"y":-7,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":30,"instructionType":"PTP"},{"name":"dose_B_offset_020","x":13,"y":-7.5,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":31,"instructionType":"PTP"},{"name":"dose_B_offset_030","x":25.5,"y":-9.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":32,"instructionType":"PTP"},{"name":"dose_B_offset_040","x":37.5,"y":-11,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":33,"instructionType":"PTP"},{"name":"dose_B_offset_050","x":38,"y":-3,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":34,"instructionType":"PTP"},{"name":"dose_B_offset_060","x":25.5,"y":-4.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":35,"instructionType":"PTP"},{"name":"dose_B_offset_070","x":13,"y":-4,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":36,"instructionType":"PTP"},{"name":"dose_B_offset_080","x":15,"y":-7.5,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":37,"instructionType":"PTP"},{"name":"dose_B_offset_090","x":19,"y":-2.5,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":38,"instructionType":"PTP"},{"name":"dose_B_offset_100","x":22,"y":-7,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":39,"instructionType":"PTP"},{"name":"dose_B_offset_105","x":22,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":40,"instructionType":"PTP"},{"name":"dose_B_offset_110","x":23,"y":-5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":41,"instructionType":"PTP"},{"name":"dose_B_offset_115","x":24,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":42,"instructionType":"PTP"},{"name":"dose_B_offset_120","x":25,"y":-11.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":43,"instructionType":"PTP"},{"name":"dose_B_offset_125","x":26,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":44,"instructionType":"PTP"},{"name":"dose_B_offset_130","x":27,"y":-4.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":45,"instructionType":"PTP"},{"name":"dose_B_offset_135","x":28,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":46,"instructionType":"PTP"},{"name":"dose_B_offset_140","x":29,"y":-12,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":47,"instructionType":"PTP"},{"name":"dose_B_offset_145","x":30,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":48,"instructionType":"PTP"},{"name":"dose_B_offset_150","x":31,"y":-4,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":49,"instructionType":"PTP"},{"name":"dose_B_offset_155","x":33,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":50,"instructionType":"PTP"},{"name":"dose_B_offset_160","x":35,"y":-9.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":51,"instructionType":"PTP"},{"name":"dose_B_offset_165","x":36,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":52,"instructionType":"PTP"},{"name":"dose_B_offset_170","x":37,"y":-4.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":53,"instructionType":"PTP"},{"name":"dose_B_offset_180","x":35.5,"y":-9.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":54,"instructionType":"PTP"},{"name":"dose_B_offset_190","x":31,"y":-5.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":55,"instructionType":"PTP"},{"name":"dose_B_offset_200","x":29,"y":-7.5,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":56,"instructionType":"PTP"},{"name":"dose_B_offset_210","x":19,"y":-5,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":57,"instructionType":"PTP"},{"name":"dose_B_offset_220","x":31,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":58,"instructionType":"PTP"},{"name":"dose_B_offset_230","x":36,"y":-7,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":59,"instructionType":"PTP"}];
+    const trajectoryData3D = [{"name":"dose_A_offset_010","x":15,"y":1,"z":45.274462,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":0,"instructionType":"PTP"},{"name":"dose_A_offset_020","x":13,"y":0.5,"z":0.774462,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":1,"instructionType":"PTP"},{"name":"dose_A_offset_030","x":25.5,"y":0.5,"z":1.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":2,"instructionType":"PTP"},{"name":"dose_A_offset_040","x":37.5,"y":-1,"z":1.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":3,"instructionType":"PTP"},{"name":"dose_A_offset_050","x":38,"y":7,"z":1.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":4,"instructionType":"PTP"},{"name":"dose_A_offset_060","x":25.5,"y":5.5,"z":1.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":5,"instructionType":"PTP"},{"name":"dose_A_offset_070","x":13,"y":4,"z":0.774462,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":6,"instructionType":"PTP"},{"name":"dose_A_offset_080","x":15,"y":0.5,"z":0.774462,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":7,"instructionType":"PTP"},{"name":"dose_A_offset_090","x":19,"y":5.5,"z":0.774462,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":8,"instructionType":"PTP"},{"name":"dose_A_offset_100","x":22,"y":1,"z":0.774462,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":9,"instructionType":"PTP"},{"name":"dose_A_offset_105","x":22,"y":3,"z":3.45810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":10,"instructionType":"PTP"},{"name":"dose_A_offset_110","x":23,"y":5,"z":1.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":11,"instructionType":"PTP"},{"name":"dose_A_offset_115","x":24,"y":3,"z":3.45810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":12,"instructionType":"PTP"},{"name":"dose_A_offset_120","x":25,"y":-1.5,"z":1.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":13,"instructionType":"PTP"},{"name":"dose_A_offset_125","x":26,"y":3,"z":3.45810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":14,"instructionType":"PTP"},{"name":"dose_A_offset_130","x":27,"y":5.5,"z":1.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":15,"instructionType":"PTP"},{"name":"dose_A_offset_135","x":28,"y":3,"z":3.45810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":16,"instructionType":"PTP"},{"name":"dose_A_offset_140","x":29,"y":-2,"z":1.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":17,"instructionType":"PTP"},{"name":"dose_A_offset_145","x":30,"y":3,"z":3.45810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":18,"instructionType":"PTP"},{"name":"dose_A_offset_150","x":31,"y":6,"z":1.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":19,"instructionType":"PTP"},{"name":"dose_A_offset_155","x":33,"y":3,"z":3.45810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":20,"instructionType":"PTP"},{"name":"dose_A_offset_160","x":35,"y":0.5,"z":1.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":21,"instructionType":"PTP"},{"name":"dose_A_offset_165","x":36,"y":3,"z":3.45810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":22,"instructionType":"PTP"},{"name":"dose_A_offset_170","x":37,"y":5.5,"z":1.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":23,"instructionType":"PTP"},{"name":"dose_A_offset_180","x":35.5,"y":0.5,"z":3.45810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":24,"instructionType":"PTP"},{"name":"dose_A_offset_190","x":31,"y":4.5,"z":3.45810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":25,"instructionType":"PTP"},{"name":"dose_A_offset_200","x":29,"y":2.5,"z":3.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":26,"instructionType":"PTP"},{"name":"dose_A_offset_210","x":19,"y":3,"z":2.2744619999999998,"basePoint":"Xdose_A_1","doseType":"A","sequenceIndex":27,"instructionType":"PTP"},{"name":"dose_A_offset_220","x":31,"y":3,"z":17.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":28,"instructionType":"PTP"},{"name":"dose_A_offset_230","x":36,"y":3,"z":27.95810342,"basePoint":"Xdose_A_2","doseType":"A","sequenceIndex":29,"instructionType":"PTP"},{"name":"dose_B_offset_010","x":15,"y":-7,"z":45.168337673,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":30,"instructionType":"PTP"},{"name":"dose_B_offset_020","x":13,"y":-7.5,"z":0.668337673,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":31,"instructionType":"PTP"},{"name":"dose_B_offset_030","x":25.5,"y":-9.5,"z":1.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":32,"instructionType":"PTP"},{"name":"dose_B_offset_040","x":37.5,"y":-11,"z":1.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":33,"instructionType":"PTP"},{"name":"dose_B_offset_050","x":38,"y":-3,"z":1.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":34,"instructionType":"PTP"},{"name":"dose_B_offset_060","x":25.5,"y":-4.5,"z":1.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":35,"instructionType":"PTP"},{"name":"dose_B_offset_070","x":13,"y":-4,"z":0.668337673,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":36,"instructionType":"PTP"},{"name":"dose_B_offset_080","x":15,"y":-7.5,"z":0.668337673,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":37,"instructionType":"PTP"},{"name":"dose_B_offset_090","x":19,"y":-2.5,"z":0.668337673,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":38,"instructionType":"PTP"},{"name":"dose_B_offset_100","x":22,"y":-7,"z":0.668337673,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":39,"instructionType":"PTP"},{"name":"dose_B_offset_105","x":22,"y":-7,"z":3.49627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":40,"instructionType":"PTP"},{"name":"dose_B_offset_110","x":23,"y":-5,"z":1.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":41,"instructionType":"PTP"},{"name":"dose_B_offset_115","x":24,"y":-7,"z":3.49627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":42,"instructionType":"PTP"},{"name":"dose_B_offset_120","x":25,"y":-11.5,"z":1.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":43,"instructionType":"PTP"},{"name":"dose_B_offset_125","x":26,"y":-7,"z":3.49627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":44,"instructionType":"PTP"},{"name":"dose_B_offset_130","x":27,"y":-4.5,"z":1.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":45,"instructionType":"PTP"},{"name":"dose_B_offset_135","x":28,"y":-7,"z":3.49627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":46,"instructionType":"PTP"},{"name":"dose_B_offset_140","x":29,"y":-12,"z":1.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":47,"instructionType":"PTP"},{"name":"dose_B_offset_145","x":30,"y":-7,"z":3.49627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":48,"instructionType":"PTP"},{"name":"dose_B_offset_150","x":31,"y":-4,"z":1.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":49,"instructionType":"PTP"},{"name":"dose_B_offset_155","x":33,"y":-7,"z":3.49627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":50,"instructionType":"PTP"},{"name":"dose_B_offset_160","x":35,"y":-9.5,"z":1.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":51,"instructionType":"PTP"},{"name":"dose_B_offset_165","x":36,"y":-7,"z":3.49627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":52,"instructionType":"PTP"},{"name":"dose_B_offset_170","x":37,"y":-4.5,"z":1.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":53,"instructionType":"PTP"},{"name":"dose_B_offset_180","x":35.5,"y":-9.5,"z":3.49627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":54,"instructionType":"PTP"},{"name":"dose_B_offset_190","x":31,"y":-5.5,"z":3.49627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":55,"instructionType":"PTP"},{"name":"dose_B_offset_200","x":29,"y":-7.5,"z":3.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":56,"instructionType":"PTP"},{"name":"dose_B_offset_210","x":19,"y":-5,"z":2.168337673,"basePoint":"Xdose_B_1","doseType":"B","sequenceIndex":57,"instructionType":"PTP"},{"name":"dose_B_offset_220","x":31,"y":-7,"z":17.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":58,"instructionType":"PTP"},{"name":"dose_B_offset_230","x":36,"y":-7,"z":27.99627256,"basePoint":"Xdose_B_2","doseType":"B","sequenceIndex":59,"instructionType":"PTP"}];
     let currentFrame = 0;
     let isPlaying = false;
     let animationSpeed = 1; // 1x = 500ms per frame
     let animationInterval = null;
+    let currentView = '2D'; // Track current view
     
-    // Animation functions
+    // View Switcher
+    function switchView(view) {
+      currentView = view;
+      
+      // Update buttons
+      document.getElementById('btn2D').classList.toggle('active', view === '2D');
+      document.getElementById('btn3D').classList.toggle('active', view === '3D');
+      
+      // Update chart visibility
+      document.getElementById('chart2D').classList.toggle('active', view === '2D');
+      document.getElementById('chart3D').classList.toggle('active', view === '3D');
+      
+      // Redraw current animation state
+      updateAnimation();
+    }
+    
+    // Animation functions - synchronized between 2D and 3D
     function updateAnimation() {
-      if (!trajectoryData || currentFrame >= trajectoryData.length) {
+      if (!trajectoryData2D || currentFrame >= trajectoryData2D.length) {
         pause();
         return;
       }
       
-      const segment = trajectoryData.slice(0, currentFrame + 1);
-      const currentPoint = trajectoryData[currentFrame];
-      
-      // Update trajectory line
-      const pathX = segment.map(p => p.x);
-      const pathY = segment.map(p => p.y);
-      
-      // Add trajectory trace if not exists
-      if (traces.length === 4) {
-        traces.push({
-          x: [],
-          y: [],
-          mode: 'lines',
-          type: 'scatter',
-          name: 'Trajectory',
-          line: { color: '#f59e0b', width: 2 },
-          hoverinfo: 'skip',
-        });
+      // Update 2D animation
+      if (trajectoryData2D && traces.length >= 6) {
+        const segment2D = trajectoryData2D.slice(0, currentFrame + 1);
+        const currentPoint2D = trajectoryData2D[currentFrame];
+        
+        const pathX = segment2D.map(p => p.x);
+        const pathY = segment2D.map(p => p.y);
+        
+        // Update traces
+        traces[4].x = pathX;
+        traces[4].y = pathY;
+        traces[5].x = [currentPoint2D.x];
+        traces[5].y = [currentPoint2D.y];
+        traces[5].text = [currentPoint2D.name];
+        
+        // Use update to preserve user interactions (zoom, pan)
+        Plotly.restyle('chart2D', {
+          x: [pathX, [currentPoint2D.x]],
+          y: [pathY, [currentPoint2D.y]],
+          text: [null, [currentPoint2D.name]]
+        }, [4, 5]);
       }
       
-      // Add current point highlight if not exists
-      if (traces.length === 5) {
-        traces.push({
-          x: [],
-          y: [],
-          mode: 'markers',
-          type: 'scatter',
-          name: 'Current Point',
-          marker: {
-            size: 14,
-            color: '#ef4444',
-            symbol: 'star',
-            line: { width: 2, color: '#dc2626' }
-          },
-          text: [],
-          hovertemplate: '<b>%{text}</b><br>Frame: ' + currentFrame + '<extra></extra>',
-        });
+      // Update 3D animation
+      if (trajectoryData3D && traces3D.length >= 6) {
+        const segment3D = trajectoryData3D.slice(0, currentFrame + 1);
+        const currentPoint3D = trajectoryData3D[currentFrame];
+        
+        const pathX3D = segment3D.map(p => p.x);
+        const pathY3D = segment3D.map(p => p.y);
+        const pathZ3D = segment3D.map(p => p.z);
+        
+        // Update traces - use restyle to preserve camera position
+        traces3D[4].x = pathX3D;
+        traces3D[4].y = pathY3D;
+        traces3D[4].z = pathZ3D;
+        traces3D[5].x = [currentPoint3D.x];
+        traces3D[5].y = [currentPoint3D.y];
+        traces3D[5].z = [currentPoint3D.z];
+        traces3D[5].text = [currentPoint3D.name];
+        
+        // Use Plotly.restyle to preserve 3D camera orientation
+        Plotly.restyle('chart3D', {
+          x: [pathX3D, [currentPoint3D.x]],
+          y: [pathY3D, [currentPoint3D.y]],
+          z: [pathZ3D, [currentPoint3D.z]],
+          text: [null, [currentPoint3D.name]]
+        }, [4, 5]);
       }
-      
-      // Update traces
-      traces[4].x = pathX;
-      traces[4].y = pathY;
-      traces[5].x = [currentPoint.x];
-      traces[5].y = [currentPoint.y];
-      traces[5].text = [currentPoint.name];
-      
-      Plotly.react('chart', traces, layout, config);
       
       // Update progress
-      const progress = ((currentFrame + 1) / trajectoryData.length) * 100;
+      const progress = ((currentFrame + 1) / trajectoryData2D.length) * 100;
       document.getElementById('progressFill').style.width = progress + '%';
       document.getElementById('progressText').textContent = 
-        (currentFrame + 1) + ' / ' + trajectoryData.length;
+        (currentFrame + 1) + ' / ' + trajectoryData2D.length;
     }
     
     function nextFrame() {
-      if (!trajectoryData) return;
+      if (!trajectoryData2D) return;
       
-      if (currentFrame < trajectoryData.length - 1) {
+      if (currentFrame < trajectoryData2D.length - 1) {
         currentFrame++;
         updateAnimation();
       } else {
@@ -359,7 +501,7 @@
     }
     
     function play() {
-      if (!trajectoryData || isPlaying) return;
+      if (!trajectoryData2D || isPlaying) return;
       
       isPlaying = true;
       document.getElementById('playBtn').textContent = '⏸ Pause';
@@ -390,16 +532,20 @@
       pause();
       currentFrame = 0;
       
-      // Remove animation traces
+      // Remove animation traces from both views
       if (traces.length > 4) {
         traces.splice(4);
       }
+      if (traces3D.length > 4) {
+        traces3D.splice(4);
+      }
       
-      Plotly.react('chart', traces, layout, config);
+      Plotly.react('chart2D', traces, layout, config);
+      Plotly.react('chart3D', traces3D, layout3D, config3D);
       
       // Reset progress
       document.getElementById('progressFill').style.width = '0%';
-      document.getElementById('progressText').textContent = '0 / ' + trajectoryData.length;
+      document.getElementById('progressText').textContent = '0 / ' + trajectoryData2D.length;
     }
     
     function setSpeed(speed) {

@@ -98,28 +98,31 @@ export function generate3DLayout() {
         title: 'X Position (mm)',
         gridcolor: '#e5e7eb',
         showgrid: true,
+        backgroundcolor: '#fafafa',
       },
       yaxis: {
         title: 'Y Position (mm)',
         gridcolor: '#e5e7eb',
         showgrid: true,
+        backgroundcolor: '#fafafa',
       },
       zaxis: {
         title: 'Z Position (mm)',
         gridcolor: '#e5e7eb',
         showgrid: true,
+        backgroundcolor: '#fafafa',
       },
       camera: {
         eye: { x: 1.5, y: 1.5, z: 1.2 },
         center: { x: 0, y: 0, z: 0 },
       },
-      aspectmode: 'cube',
+      aspectmode: 'auto',
     },
     hovermode: 'closest',
     showlegend: true,
     legend: {
-      x: 1.02,
-      y: 1,
+      x: 0.02,
+      y: 0.98,
       xanchor: 'left',
       yanchor: 'top',
       bgcolor: 'rgba(255, 255, 255, 0.9)',
@@ -128,6 +131,7 @@ export function generate3DLayout() {
     },
     plot_bgcolor: '#fafafa',
     paper_bgcolor: 'white',
-    margin: { t: 40, b: 40, l: 40, r: 150 },
+    margin: { t: 10, b: 10, l: 10, r: 10 },
+    autosize: true,
   };
 }
